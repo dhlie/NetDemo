@@ -12,4 +12,5 @@ public class Domain {
     public static final String TAOBAO = "http://ip.taobao.com/";
     public static final String SINA = "http://int.dpool.sina.com.cn/";
     public static final String ALIYUN = "http://gc.ditu.aliyun.com/";
+    public static final String REST = "http://rest.zhibo.tv/";
 }

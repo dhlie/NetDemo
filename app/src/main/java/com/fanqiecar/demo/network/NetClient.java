@@ -2,8 +2,6 @@ package com.fanqiecar.demo.network;
 
 import android.util.Log;
 
-import com.fanqiecar.demo.network.gsonconverter.GsonConverterFactory;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -14,6 +12,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by DuanHl on 2018/3/10.
@@ -29,6 +28,8 @@ public class NetClient {
     private static final String HEADER_DOMAIN = "domain";
 
     public static final String HEADER_DOMAIN_PREFIX = HEADER_DOMAIN+": ";
+
+    private HttpLoggingInterceptor.Level LOG_LEVEL = HttpLoggingInterceptor.Level.BODY;
 
     private final String mBaseUrl = "http://www.zhibo.tv/";
 
@@ -49,20 +50,20 @@ public class NetClient {
         mOkHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
                 .addInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(Chain chain) throws IOException {
                         return chain.proceed(processRequest(chain.request()));
                     }
                 })
-                .addNetworkInterceptor(new Interceptor() {
-                    @Override
-                    public Response intercept(Chain chain) throws IOException {
-//                        Log.i(TAG, "response:" + chain.request().url().toString());
-                        return chain.proceed(chain.request());
-                    }
-                })
+                .addInterceptor(new HttpLoggingInterceptor().setLevel(LOG_LEVEL))
+//                .addNetworkInterceptor(new Interceptor() {
+//                    @Override
+//                    public Response intercept(Chain chain) throws IOException {
+//                        return chain.proceed(chain.request());
+//                    }
+//                })
                 .build();
     }
 
@@ -88,7 +89,6 @@ public class NetClient {
                     .host(httpUrl.host())
                     .port(httpUrl.port())
                     .build();
-            Log.i(TAG, "origin:"+request.url().toString()+"\n       " + newUrl.toString());
             request = request.newBuilder()
                     .removeHeader(HEADER_DOMAIN)
                     .url(newUrl)
@@ -101,4 +101,41 @@ public class NetClient {
         return mRetrofit.create(clazz);
     }
 
+    public <T> T createDownloadService(Class<T> clazz, final ProgressListener progressListener) {
+        OkHttpClient client = mOkHttpClient.newBuilder()
+                .addNetworkInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Response originalResponse = chain.proceed(chain.request());
+                        return originalResponse.newBuilder()
+                                .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                                .build();
+                    }
+                })
+                .build();
+        Retrofit retrofit = mRetrofit.newBuilder().client(client).build();
+        return retrofit.create(clazz);
+    }
+
+    public <T> T createUploadService(Class<T> clazz, final ProgressListener progressListener) {
+        OkHttpClient client = mOkHttpClient.newBuilder()
+                .addNetworkInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request();
+                        if (request.body() == null) {
+                            return chain.proceed(request);
+                        }
+
+                        Request progressRequest = request.newBuilder()
+                                .method(request.method(), new ProgressRequestBody(request.body(), progressListener))
+                                .build();
+
+                        return chain.proceed(progressRequest);
+                    }
+                })
+                .build();
+        Retrofit retrofit = mRetrofit.newBuilder().client(client).build();
+        return retrofit.create(clazz);
+    }
 }

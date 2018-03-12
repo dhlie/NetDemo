@@ -28,6 +28,12 @@
             android:layout_marginLeft="20dp"
             android:text="btn3"
             android:onClick="btn3"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
         <Button
             android:layout_width="100dp"
             android:layout_height="40dp"
@@ -40,6 +46,12 @@
             android:layout_marginLeft="20dp"
             android:text="btn5"
             android:onClick="btn5"/>
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:text="btn6"
+            android:onClick="btn6"/>
     </LinearLayout>
     <TextView
         android:layout_width="match_parent"

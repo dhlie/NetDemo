@@ -5,12 +5,24 @@ import com.fanqiecar.demo.model.City;
 import com.fanqiecar.demo.model.Data;
 import com.fanqiecar.demo.model.Location;
 import com.fanqiecar.demo.model.RespData;
+import com.fanqiecar.demo.model.ShareWords;
+import com.fanqiecar.demo.model.UploadResult;
 import com.fanqiecar.demo.network.NetClient;
 
+import java.util.Map;
+
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.Multipart;
+import retrofit2.http.POST;
+import retrofit2.http.Part;
+import retrofit2.http.PartMap;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 /**
  * Created by DuanHl on 2018/3/10.
@@ -35,4 +47,18 @@ public interface Api {
     @Headers(NetClient.HEADER_DOMAIN_PREFIX + Domain.ALIYUN)
     @GET("/regeocoding?l=39.938133,116.395739&type=001")
     Observable<Location> queryLocation();
+
+    @Headers(NetClient.HEADER_DOMAIN_PREFIX + Domain.REST)
+    @GET("/share/words")
+    Observable<RespData<ShareWords>> getShareWords();
+
+    @GET
+    Completable downloadApk(@Url String url);
+
+    //http://rest.zhibo.tv/user/update-head-img
+    //token=78632a2036aebfea36309e4a0d34f743*2166&head_img=FILE
+    @Multipart
+    @POST
+    Observable<RespData<UploadResult>> upload(@Url String url, @Part MultipartBody.Part file, @Part("token") RequestBody description);
+
 }
