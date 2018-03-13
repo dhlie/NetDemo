@@ -7,9 +7,6 @@ import com.fanqiecar.demo.model.Location;
 import com.fanqiecar.demo.model.RespData;
 import com.fanqiecar.demo.model.ShareWords;
 import com.fanqiecar.demo.model.UploadResult;
-import com.fanqiecar.demo.network.NetClient;
-
-import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -20,7 +17,6 @@ import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
-import retrofit2.http.PartMap;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 

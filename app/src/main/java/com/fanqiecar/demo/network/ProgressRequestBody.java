@@ -49,15 +49,25 @@ public class ProgressRequestBody extends RequestBody {
     private Sink sink(Sink sink) {
         return new ForwardingSink(sink) {
             long bytesWirtten = 0L;
-            long contentLength = -1L;
+            long contentLength = 0L;
+            long time;
 
             @Override public void write(Buffer source, long byteCount) throws IOException {
                 super.write(source, byteCount);
-                if (contentLength == -1L) {
+                if (contentLength == 0L) {
                     contentLength = contentLength();
                 }
                 bytesWirtten += byteCount;
-                progressListener.update(bytesWirtten, contentLength, bytesWirtten == contentLength);
+
+                long ct = System.currentTimeMillis();
+                if (ct - time >= 16) {
+                    time = ct;
+                    progressListener.update(bytesWirtten, contentLength, bytesWirtten == contentLength);
+                } else {
+                    if (bytesWirtten == contentLength) {
+                        progressListener.update(bytesWirtten, contentLength, bytesWirtten == contentLength);
+                    }
+                }
             }
         };
     }

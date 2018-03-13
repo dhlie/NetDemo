@@ -117,6 +117,11 @@ public final class HttpLoggingInterceptor implements Interceptor {
     this(Logger.DEFAULT);
   }
 
+    public HttpLoggingInterceptor(Level level) {
+        this(Logger.DEFAULT);
+        this.level = level;
+    }
+
   public HttpLoggingInterceptor(Logger logger) {
     this.logger = logger;
   }

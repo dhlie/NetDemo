@@ -43,12 +43,23 @@ public class ProgressResponseBody extends ResponseBody {
     private Source source(Source source) {
         return new ForwardingSource(source) {
             long totalBytesRead = 0L;
+            long time;
 
             @Override public long read(Buffer sink, long byteCount) throws IOException {
                 long bytesRead = super.read(sink, byteCount);
                 // read() returns the number of bytes read, or -1 if this source is exhausted.
                 totalBytesRead += bytesRead != -1 ? bytesRead : 0;
-                progressListener.update(totalBytesRead, responseBody.contentLength(), bytesRead == -1);
+//                progressListener.update(totalBytesRead, responseBody.contentLength(), bytesRead == -1);
+
+                long ct = System.currentTimeMillis();
+                if (ct - time >= 16) {
+                    time = ct;
+                    progressListener.update(totalBytesRead, responseBody.contentLength(), bytesRead == -1);
+                } else {
+                    if (bytesRead == -1) {
+                        progressListener.update(totalBytesRead, responseBody.contentLength(), bytesRead == -1);
+                    }
+                }
                 return bytesRead;
             }
         };

@@ -1,7 +1,6 @@
 package com.fanqiecar.demo;
 
 import android.app.Activity;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -9,23 +8,18 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.fanqiecar.demo.api.Api;
-import com.fanqiecar.demo.model.AreaOfIP;
 import com.fanqiecar.demo.model.City;
 import com.fanqiecar.demo.model.Data;
 import com.fanqiecar.demo.model.RespData;
 import com.fanqiecar.demo.model.ShareWords;
 import com.fanqiecar.demo.model.UploadResult;
-import com.fanqiecar.demo.network.NetClient;
+import com.fanqiecar.demo.network.NetService;
 import com.fanqiecar.demo.network.ProgressListener;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import io.reactivex.CompletableObserver;
-import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -47,7 +41,7 @@ public class MainActivity extends Activity {
     }
 
     public void btn1(View view) {
-        NetClient.getInstance().create(Api.class)
+        NetService.createService(Api.class)
 //                .queryIp("63.223.108.42")
                 .queryIp1()
                 .subscribeOn(Schedulers.io())
@@ -77,7 +71,7 @@ public class MainActivity extends Activity {
     }
 
     public void btn2(View view) {
-        NetClient.getInstance().create(Api.class)
+        NetService.createService(Api.class)
                 .queryIp2("63.223.108.42")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -96,7 +90,7 @@ public class MainActivity extends Activity {
     }
 
     public void btn3(View view) {
-        NetClient.getInstance().create(Api.class)
+        NetService.createService(Api.class)
                 .getShareWords()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -124,7 +118,7 @@ public class MainActivity extends Activity {
     }
 
     public void btn4(View view) {
-        NetClient.getInstance().createDownloadService(Api.class, new ProgressListener() {
+        NetService.createDownloadService(Api.class, new ProgressListener() {
             @Override
             public void update(long bytesRead, long contentLength, boolean done) {
                 Log.i("NetClient", "read count:"+bytesRead+"  total:"+contentLength+"   finish:"+done);
@@ -163,7 +157,7 @@ public class MainActivity extends Activity {
 
 
         RespData<UploadResult> d = null;
-        NetClient.getInstance().createUploadService(Api.class, new ProgressListener() {
+        NetService.createUploadService(Api.class, new ProgressListener() {
             @Override
             public void update(long bytesRead, long contentLength, boolean done) {
                 Log.i("NetClient", "read count:"+bytesRead+"  total:"+contentLength+"   finish:"+done);
@@ -197,6 +191,6 @@ public class MainActivity extends Activity {
     }
 
     public void btn6(View view) {
-        Api api = NetClient.getInstance().create(Api.class);
+        Api api = NetService.createService(Api.class);
     }
 }
