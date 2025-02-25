@@ -15,7 +15,7 @@ public class City {
      * district :
      * isp :
      * type :
-     * desc :
+     * desc : dev
      */
 
     private int ret;
